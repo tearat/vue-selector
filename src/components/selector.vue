@@ -8,21 +8,19 @@
             </p>
         </div>
 
-        <p>selected: {{ selected }}</p>
-
         <!-- Selected list -->
         <div>
             Selected:
             <span v-if="!selected || !selected.length">nothing</span>
 
             <div v-if="!multiple && selected" class="selector__selected-list">
-                <span class="selector__selected-item" @click="deselectItem(selected)">
+                <span class="selector__selected-list__item" @click="deselectItem(selected)">
                     {{ selected.title }}
                 </span>
             </div>
 
             <div v-if="multiple && selected.length" class="selector__selected-list">
-                <span class="selector__selected-item" v-for="item in selected" :key="item.id" @click="deselectItem(item)">
+                <span class="selector__selected-list__item" v-for="item in selected" :key="item.id" @click="deselectItem(item)">
                     {{ item.title }}
                 </span>
             </div>
@@ -38,7 +36,7 @@
         <div class="selector__items">
             <ul class="selector__items-list">
                 <li
-                class="selector__item"
+                class="selector__items-list__item"
                 v-for="item in itemsFiltered"
                 :class="{'selected': isSelected(item)}"
                 :key="item.id">
@@ -134,79 +132,80 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 
 .selector {
     width: 800px;
     margin: 20px auto;
     padding: 10px;
     background: #ddd;
+
+    &__title {
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    &__selected {
+        background: #fbb;
+    }
+
+    &__selected-list {
+        &__item {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 1px;
+            cursor: pointer;
+            filter: brightness(1.1);
+            background: royalblue;
+            color: white;
+        }
+    }
+
+    &__filter {
+        border: none;
+        background: #aaa;
+        padding: 10px;
+        margin: 5px;
+    }
+
+    &__items {
+        margin-top: 10px;
+        background: #999;
+    }
+
+    &__items-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        span, a {
+            padding: 10px;
+        }
+
+        &__item {
+            display: grid;
+            grid-template-columns: 1fr 1fr 60px;
+            background: #999;
+            cursor: pointer;
+            &:hover {
+                filter: brightness(1.1);
+            }
+            &.selected {
+                background: #7d8;
+            }
+
+            .left {
+                text-align: left;
+            }
+
+            .right {
+                text-align: right;
+            }
+        }
+    }
 }
 
-.selector__title {
-    font-size: 18px;
-    font-weight: 700;
-}
 
-.selector__selected {
-    background: #fbb;
-}
 
-.selector__selected-list {
-}
-
-.selector__selected-item {
-    display: inline-block;
-    padding: 5px 10px;
-    margin: 1px;
-    cursor: pointer;
-    filter: brightness(1.1);
-    background: #f77;
-}
-
-.selector__filter {
-    border: none;
-    background: #aaa;
-    padding: 10px;
-    margin: 5px;
-}
-
-.selector__items {
-    margin-top: 10px;
-    background: #999;
-}
-
-.selector__items-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.selector__item {
-    display: grid;
-    grid-template-columns: 1fr 1fr 60px;
-    background: #aaa;
-    cursor: pointer;
-    padding: 5px;
-}
-
-.selector__item span, .selector__item a {
-    padding: 5px;
-}
-
-.selector__item .left {
-    text-align: left;
-}
-.selector__item .right {
-    text-align: right;
-}
-
-.selector__item:hover {
-    filter: brightness(1.1);
-}
-
-.selected {
-    background: green;
-}
 
 </style>

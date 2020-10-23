@@ -1,7 +1,7 @@
 <template>
 <div class="hello">
 
-    <Selector title="Single tem" :items="heroes" v-on:select="selectOne"></Selector>
+    <Selector title="Single item" :items="heroes" v-on:select="selectOne"></Selector>
     <Selector title="Multiple items" :items="heroes" v-on:select="selectMany" multiple></Selector>
 
 </div>
