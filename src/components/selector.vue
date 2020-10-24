@@ -10,17 +10,17 @@
 
         <!-- Selected list -->
         <div>
-            Selected:
-            <span v-if="!selected || !selected.length">nothing</span>
+            Выбрано:
+            <span v-if="!selected || !selected.length">пусто</span>
 
             <div v-if="!multiple && selected" class="selector__selected-list">
                 <span class="selector__selected-list__item" @click="deselectItem(selected)">
-                    {{ selected.title }}
+                    {{ selectedToData[0].title }}
                 </span>
             </div>
 
             <div v-if="multiple && selected.length" class="selector__selected-list">
-                <span class="selector__selected-list__item" v-for="item in selected" :key="item.id" @click="deselectItem(item)">
+                <span class="selector__selected-list__item" v-for="item in selectedToData" :key="item.id" @click="deselectItem(item.id)">
                     {{ item.title }}
                 </span>
             </div>
@@ -42,7 +42,7 @@
                 :key="item.id">
                     <span @click="selectItem(item)" class="left">{{ item.title }}</span>
                     <span @click="selectItem(item)" class="right">{{ item.summary }}</span>
-                    <a href="https://yandex.ru" target="_blank">Open</a>
+                    <a :href="`/${type}/${item.id}`" target="_blank">Open</a>
                 </li>
             </ul>
         </div>
@@ -52,9 +52,12 @@
 
 
 <script>
-
 export default {
     props: {
+        type: {
+            type: String,
+            required: true
+        },
         title: {
             type: String,
             default: "Выбрано"
@@ -63,7 +66,7 @@ export default {
             type: Array,
             required: true
         },
-        preSelected: {
+        modelValue: {
             default: null
         },
         multiple: {
@@ -78,6 +81,16 @@ export default {
         }
     },
     computed: {
+        selectedToData() {
+            if( !this.multiple ) {
+                return this.items.filter(item => item.id == this.selected)
+            } else {
+                return this.items.filter(item => this.selected.includes(item.id))
+            }
+        },
+        selectedIdsToData() {
+            return this.items.filter(item => [this.selected].includes(item.id))
+        },
         itemsFiltered() {
             if ( this.filter == '*' ) {
                 return this.items
@@ -85,36 +98,37 @@ export default {
             if( !this.filter.length ) {
                 return []
             } else {
-                return this.items.filter(item => item.title.toLowerCase().indexOf(this.filter.toLowerCase()) != -1)
+                return this.items.filter(item =>
+                    item.title.toLowerCase().indexOf(this.filter.toLowerCase()) != -1
+                )
             }
         },
     },
     methods: {
         selectItem(selectedItem) {
             if( selectedItem && !this.multiple ) {
-                this.selected = (this.selected == selectedItem) ? null : selectedItem
+                this.selected = (this.selected == selectedItem.id) ? null : selectedItem.id
+                this.$emit('update:modelValue', this.selected)
             }
-
             if( selectedItem && this.multiple ) {
-                if( this.selected.includes(selectedItem) ) {
-                    let index = this.selected.findIndex(item => item == selectedItem)
+                if( this.selected.includes(selectedItem.id) ) {
+                    let index = this.selected.findIndex(item => item == selectedItem.id)
                     this.selected.splice(index, 1)
                 } else {
-                    this.selected.push(selectedItem)
+                    this.selected.push(selectedItem.id)
                 }
+                this.$emit('update:modelValue', this.selected)
             }
-
-            this.$emit('select', this.selected)
         },
         deselectItem(selectedItem) {
             if( this.multiple ) {
-                let index = this.selected.findIndex(item => item == selectedItem)
+                const index = this.selected.findIndex(item => item == selectedItem)
                 this.selected.splice(index, 1)
+                this.$emit('update:modelValue', this.selected)
             } else {
                 this.selected = null
+                this.$emit('update:modelValue', this.selected)
             }
-
-            this.$emit('select', this.selected)
         },
         isSelected(selectedItem) {
             if( !this.multiple ) {
@@ -128,27 +142,30 @@ export default {
         if( this.multiple ) {
             this.selected = []
         }
+        if( this.modelValue ) {
+            this.selected = this.modelValue
+        }
     }
 }
 </script>
 
 <style lang="scss">
 
+$transparent: rgba(180,180,255,0.05);
+$transparent_light: rgba(180,180,255,0.25);
+
 .selector {
-    width: 800px;
+    // width: 800px;
     margin: 20px auto;
     padding: 10px;
-    background: #ddd;
-
     &__title {
         font-size: 18px;
         font-weight: 700;
+        margin-bottom: 10px;
     }
-
     &__selected {
         background: #fbb;
     }
-
     &__selected-list {
         &__item {
             display: inline-block;
@@ -156,56 +173,45 @@ export default {
             margin: 1px;
             cursor: pointer;
             filter: brightness(1.1);
-            background: royalblue;
             color: white;
+            // border: 1px dashed red;
         }
     }
-
     &__filter {
         border: none;
         background: #aaa;
         padding: 10px;
         margin: 5px;
     }
-
     &__items {
         margin-top: 10px;
-        background: #999;
     }
-
     &__items-list {
         list-style: none;
         margin: 0;
         padding: 0;
-
         span, a {
             padding: 10px;
         }
-
         &__item {
             display: grid;
             grid-template-columns: 1fr 1fr 60px;
-            background: #999;
+            background: $transparent;
             cursor: pointer;
             &:hover {
+                background: $transparent_light;
                 filter: brightness(1.1);
             }
             &.selected {
-                background: #7d8;
+                background: $transparent_light;
             }
-
             .left {
                 text-align: left;
             }
-
             .right {
                 text-align: right;
             }
         }
     }
 }
-
-
-
-
 </style>

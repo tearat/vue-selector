@@ -1,8 +1,14 @@
 <template>
 <div class="hello">
 
-    <Selector title="Single item" :items="heroes" v-on:select="selectOne"></Selector>
-    <Selector title="Multiple items" :items="heroes" v-on:select="selectMany" multiple></Selector>
+    <!-- <Selector title="Single item" :items="heroes" v-on:select="selectOne"></Selector> -->
+    <!-- <Selector title="Multiple items" :items="heroes" v-on:select="selectMany" multiple></Selector> -->
+
+    <p>father_id: {{ father_id }}</p>
+    <p>friends: {{ friends }}</p>
+
+    <selector title="Отец" v-model="father_id" type="heroes" :items="heroes"></selector>
+    <selector title="Друзья" v-model="friends" type="heroes" :items="heroes" multiple></selector>
 
 </div>
 </template>
@@ -18,6 +24,8 @@ export default {
     },
     data() {
         return {
+            father_id: 1,
+            friends: [2,3],
             heroes: [
                 { id: 1, title: "AAA", summary: "Lorem ipsum dolor sit amet." },
                 { id: 2, title: "ABC", summary: "Lorem ipsum dolor sit amet." },
@@ -26,9 +34,13 @@ export default {
         }
     },
     methods: {
-        selectOne(selected) {
+        test(event) {
+            console.log("test")
+            console.log(event)
+        },
+        selectOne(id) {
             console.log("selectOneHero")
-            console.log(selected ? selected.id : null)
+            console.log(id ? id : null)
         },
         selectMany(selected) {
             console.log("selectHeroes")
